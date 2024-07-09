@@ -1,3 +1,4 @@
+from typing import Literal
 from django.db import models
 
 
@@ -40,6 +41,7 @@ class Products(models.Model):
         db_table = "product"
         verbose_name: str = "Продукт"
         verbose_name_plural: str = "Продукты"
+        ordering: tuple[Literal["id"]] = ("id",)
 
     def __str__(self) -> str:
         return f"{self.name} Количество - {self.quantity}"
