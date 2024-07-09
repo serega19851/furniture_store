@@ -1,9 +1,12 @@
-from django.shortcuts import get_list_or_404, render
+from typing import Any
+from django.shortcuts import HttpResponse, get_list_or_404, render
 from django.core.paginator import Paginator
 from goods.models import Products
 
 
-def catalog(request, category_slug, page=1):
+def catalog(request, category_slug) -> HttpResponse:
+    page: Any = request.GET.get('page', 1)
+    print(request)
     if category_slug== 'all':
         goods: BaseManager[Products] = Products.objects.all()
     else:   
