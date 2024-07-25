@@ -23,11 +23,15 @@ def login(request) -> HttpResponse:
             if user:
                 auth.login(request, user)
                 messages.success(request, f"{username}, Вы вошли в аккаунт")
+
+                if request.POST.get("next", None):
+                    return HttpResponseRedirect(request.POST.get("next"))
+
                 return HttpResponseRedirect(reverse("main:index"))
     else:
         form = UserLoginForm()
 
-    context: dict[str, str] = {
+    context: dict[str, str | UserLoginForm] = {
         "title": "Home - Авторизация",
         "form": form,
     }
@@ -46,7 +50,7 @@ def registration(request) -> HttpResponse:
     else:
         form = UserRegistrationForm()
 
-    context: dict[str, str] = {
+    context: dict[str, str | UserRegistrationForm] = {
         "title": "Home - Регистрация",
         "form": form,
     }
@@ -65,7 +69,8 @@ def profile(request) -> HttpResponse:
             return HttpResponseRedirect(reverse("user:profile"))
     else:
         form = ProfileForm(instance=request.user)
-    context: dict[str, str] = {
+
+    context: dict[str, str | ProfileForm] = {
         "title": "Home - Кабинет",
         "form": form,
     }
