@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AbstractBaseUser, auth
 from django.http import HttpResponseRedirect
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
@@ -77,8 +77,12 @@ def profile(request) -> HttpResponse:
     return render(request, "users/profile.html", context)
 
 
+def users_cart(request) -> HttpResponse:
+    return render(request, "users/users_cart.html")
+
+
 @login_required
-def logout(request):
+def logout(request)-> HttpResponsePermanentRedirect | HttpResponseRedirect:
     messages.success(request, f"{request.user.username}, Вы вышли из аккаунта")
     auth.logout(request)
     return redirect(reverse("main:index"))
