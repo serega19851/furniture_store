@@ -1,10 +1,27 @@
-from django.shortcuts import render
+from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.shortcuts import redirect, render
+
+from carts.models import Cart
+from goods.models import Products
 
 
-def cart_add(request, product_id): ...
+def cart_add(request, product_slug)-> HttpResponseRedirect | HttpResponsePermanentRedirect:
+    product: Products = Products.objects.get(slug=product_slug)
+
+    if request.user.is_authenticated:
+        carts: Cart = Cart.objects.filter(user=request.user, product=product)
+
+        if carts.exists():
+            cart: Cart | None = carts.first()
+            if cart:
+                cart.quantity += 1
+                cart.save()
+        else:
+            Cart.objects.create(user=request.user, product=product, quantity=1)
+    return redirect(request.META['HTTP_REFERER'])
 
 
-def cart_change(request, product_id): ...
+def cart_change(request, product_slug): ...
 
 
-def cart_remove(request, product_id): ...
+def cart_remove(request, product_slug): ...
