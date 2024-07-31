@@ -5,7 +5,6 @@ from goods.models import Products
 
 class CartQueryset(models.QuerySet):
     def total_price(self) -> int:
-        print(self)
         return sum(cart.products_price() for cart in self)
 
     def total_quantity(self) -> int:
