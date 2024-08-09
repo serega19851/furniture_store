@@ -31,7 +31,9 @@ def login(request) -> HttpResponse:
                 messages.success(request, f"{username}, Вы вошли в аккаунт")
 
                 if session_key:
-                    Cart.objects.filter(session_key=session_key).update(user=user)
+                    forgot_carts = Cart.objects.filter(user=user)
+                    if forgot_carts.exists():
+                        forgot_carts.delete()
                     
                 redirect_page: Any = request.POST.get("next", None)
                 if redirect_page and redirect_page != reverse("user:logout"):

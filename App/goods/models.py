@@ -9,11 +9,12 @@ class Categories(models.Model):
     )
 
     class Meta:
-        db_table: str = "category"
-        verbose_name: str = "Категорию"
-        verbose_name_plural: str = "Категории"
+        db_table = "category"
+        verbose_name = "Категорию"
+        verbose_name_plural = "Категории"
+        ordering = ("id",)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
 
 
@@ -39,20 +40,20 @@ class Products(models.Model):
 
     class Meta:
         db_table = "product"
-        verbose_name: str = "Продукт"
-        verbose_name_plural: str = "Продукты"
-        ordering: tuple[Literal["id"]] = ("id",)
+        verbose_name = "Продукт"
+        verbose_name_plural = "Продукты"
+        ordering = ("id",)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.name} Количество - {self.quantity}"
 
     def get_absolute_url(self):
         return reverse("catalog:product", kwargs={"product_slug": self.slug})
 
-    def display_id(self) -> str:
+    def display_id(self):
         return f"{self.id:05}"
 
-    def sell_price(self) -> str:
+    def sell_price(self):
         if self.discount:
             return round(self.price - self.price * self.discount / 100, 2)
 

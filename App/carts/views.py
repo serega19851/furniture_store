@@ -1,10 +1,10 @@
 from django.http import JsonResponse
-from django.shortcuts import redirect
-
-from carts.utils import get_user_carts
-from carts.models import Cart
-from goods.models import Products
 from django.template.loader import render_to_string
+from django.urls import reverse
+
+from carts.models import Cart
+from carts.utils import get_user_carts
+from goods.models import Products
 
 
 def cart_add(request):
@@ -25,7 +25,8 @@ def cart_add(request):
 
     else:
         carts = Cart.objects.filter(
-            session_key=request.session.session_key, product=product)
+            session_key=request.session.session_key, product=product
+        )
 
         if carts.exists():
             cart = carts.first()
@@ -34,7 +35,8 @@ def cart_add(request):
                 cart.save()
         else:
             Cart.objects.create(
-                session_key=request.session.session_key, product=product, quantity=1)
+                session_key=request.session.session_key, product=product, quantity=1
+            )
 
     user_cart = get_user_carts(request)
     cart_items_html = render_to_string(
@@ -56,15 +58,24 @@ def cart_change(request):
     cart.quantity = quantity
     cart.save()
 
+    updated_quantity = cart.quantity
+
     user_cart = get_user_carts(request)
+
+    context = {"carts": user_cart}
+
+    referer = request.META.get("HTTP_REFERER")
+    if reverse("orders:create_order") in referer:
+        context["order"] = True
+
     cart_items_html = render_to_string(
-        "carts/includes/included_cart.html", {"carts": user_cart}, request=request
+        "carts/includes/included_cart.html", context, request=request
     )
 
     response_data = {
         "message": "Количество изменено",
         "cart_items_html": cart_items_html,
-        # "quantity": quantity,
+        "quantity": updated_quantity,
     }
     return JsonResponse(response_data)
 
@@ -77,8 +88,14 @@ def cart_remove(request):
     cart.delete()
 
     user_cart = get_user_carts(request)
+
+    context = {"carts": user_cart}
+    referer = request.META.get("HTTP_REFERER")
+    if reverse("orders:create_order") in referer:
+        context["order"] = True
+
     cart_items_html = render_to_string(
-        "carts/includes/included_cart.html", {"carts": user_cart}, request=request
+        "carts/includes/included_cart.html", context, request=request
     )
 
     response_data = {
